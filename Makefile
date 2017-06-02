@@ -1,5 +1,14 @@
-TAG:=kennyballou/rpmbuilder
+OPTION_FILES:=$(wildcard **/*.in)
+DOCKERFILES:= \
+	amazonlinux/Dockerfile \
+	centos/Dockerfile
 
-.PHONY: build
-build: Dockerfile
-	docker build -t $(TAG) .
+.PHONY: all
+all: $(DOCKERFILES)
+
+$(DOCKERFILES): Dockerfile.template $(OPTION_FILES)
+	bash generate.sh $< $(shell echo $@ | cut -d '/' -f1)/options.in > $@
+
+.PHONY: clean
+clean:
+	-rm $(DOCKERFILES)
